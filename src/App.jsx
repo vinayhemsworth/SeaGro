@@ -7,6 +7,10 @@ import { Jobs } from './pages/Jobs';
 import { Learning } from './pages/Learning';
 import { Bikes } from './pages/Bikes';
 import { Chat } from './pages/Chat';
+import { Community } from './pages/Community';
+import { News } from './pages/News';
+import { Sharing } from './pages/Sharing';
+import { Todos } from './pages/Todos';
 
 function App() {
   return (
@@ -21,6 +25,10 @@ function App() {
             <Route path="/learning" element={<Learning />} />
             <Route path="/bikes" element={<Bikes />} />
             <Route path="/chat" element={<Chat />} />
+            <Route path="/community" element={<Community />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/sharing" element={<Sharing />} />
+            <Route path="/todos" element={<Todos />} />
           </Routes>
         </main>
       </div>
