@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Home, Users, Briefcase, BookOpen, Bike, MessageSquare } from 'lucide-react';
+import { Menu, X, Home, Users, Briefcase, BookOpen, Bike, MessageSquare, ChevronDown, Newspaper, Share, CheckSquare, Users2 } from 'lucide-react';
 
 export function Navigation() {
   const [isOpen, setIsOpen] = React.useState(false);
+  const [showDropdown, setShowDropdown] = React.useState(false);
 
   const navItems = [
     { icon: Home, label: 'Home', to: '/' },
@@ -12,6 +13,13 @@ export function Navigation() {
     { icon: BookOpen, label: 'Learning', to: '/learning' },
     { icon: Bike, label: 'Bikes', to: '/bikes' },
     { icon: MessageSquare, label: 'Chat', to: '/chat' },
+  ];
+
+  const communityItems = [
+    { icon: Users2, label: 'Social Network', to: '/community' },
+    { icon: Newspaper, label: 'Tech News', to: '/news' },
+    { icon: Share, label: 'Content Sharing', to: '/sharing' },
+    { icon: CheckSquare, label: 'To-do Lists', to: '/todos' },
   ];
 
   return (
@@ -36,6 +44,31 @@ export function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              <div className="relative">
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="flex items-center px-4 py-2 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                >
+                  <Users2 className="w-4 h-4 mr-1.5" />
+                  Community
+                  <ChevronDown className="w-4 h-4 ml-1" />
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg py-2 border border-gray-100">
+                    {communityItems.map((item) => (
+                      <Link
+                        key={item.label}
+                        to={item.to}
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        <item.icon className="w-4 h-4 mr-2" />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -64,6 +97,20 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+            <div className="px-4 py-2">
+              <div className="text-sm font-medium text-gray-700 mb-2">Community</div>
+              {communityItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.to}
+                  className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <item.icon className="w-4 h-4 mr-2" />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       )}
