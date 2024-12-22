@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-// API URL for fetching technology news in English
+// API URL for fetching technology news  
 const API_URL = 'https://gnews.io/api/v4/search?q=technology&lang=en&apikey=da879d86c56bf9f0a41d50d5b5c31639';
 
 export function News() {
@@ -36,7 +36,7 @@ export function News() {
     };
 
     fetchNews();
-  }, []);  // Empty dependency array ensures this runs once on component mount and refresh
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -60,7 +60,7 @@ export function News() {
         )}
 
         {!loading && !error && articles.map((article, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105">
             <img
               src={article.image || 'https://via.placeholder.com/400x250'}
               alt={article.title}
@@ -73,7 +73,7 @@ export function News() {
                 href={article.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-block text-purple-500 hover:text-purple-700"
+                className="mt-4 inline-block text-teal-500 hover:text-teal-700"
               >
                 Read more
               </a>
