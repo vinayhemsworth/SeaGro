@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Briefcase } from 'lucide-react';
 import { ImageUpload } from '../../components/profile/ImageUpload';
-import { EditableField } from '../../components/profile/EditableField';
+import { EditableField } from '../../../components/profile/EditableField';
 import { ProfileStats } from './components/ProfileStats';
 import { ActivityFeed } from './components/ActivityFeed';
 import { ProfileSidebar } from './components/ProfileSidebar';
