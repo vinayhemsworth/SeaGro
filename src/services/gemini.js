@@ -2,7 +2,9 @@ import axios from 'axios';
 import { RateLimiter } from '../utils/rateLimiter';
 
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
-const API_KEY = process.env.GEMINI_API_KEY;const rateLimiter = new RateLimiter(3, 60000); // 3 requests per minute
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+const rateLimiter = new RateLimiter(3, 60000); // 3 requests per minute
 
 export const geminiService = {
   async generateResponse(messages) {
