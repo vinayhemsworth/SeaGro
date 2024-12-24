@@ -84,6 +84,3 @@ export function News() {
     </div>
   );
 }
-// The error HTTP error! status: 429 indicates that the API request limit has been exceeded.
-//  The HTTP status code 429 corresponds to "Too Many Requests," meaning you've made too many requests in a given period.
-//The gnews.io API may have a rate limit for free or limited plans

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navigation } from './components/layout/Navigation';
+import { Chatbot } from './components/chat/Chatbot';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
@@ -56,6 +57,7 @@ export default function App() {
             } />
           </Routes>
         </main>
+        <Chatbot />
       </div>
     </Router>
   );
