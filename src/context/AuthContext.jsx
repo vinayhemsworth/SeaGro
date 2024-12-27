@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/auth';
+import { chatService } from '../services/chat';
 
 const AuthContext = createContext(null);
 
@@ -8,11 +9,11 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
     if (token) {
-      // TODO: Validate token and get user data
-      setUser(JSON.parse(localStorage.getItem('user')));
+      const userData = JSON.parse(localStorage.getItem('user'));
+      setUser(userData);
+      chatService.initialize(token);
     }
     setLoading(false);
   }, []);
@@ -21,7 +22,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.login(credentials);
       setUser(data);
+      localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
+      chatService.initialize(data.token);
       return data;
     } catch (error) {
       throw error;
@@ -32,7 +35,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await authService.register(userData);
       setUser(data);
+      localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
+      chatService.initialize(data.token);
       return data;
     } catch (error) {
       throw error;
@@ -42,6 +47,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     authService.logout();
     setUser(null);
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
   };
 
