@@ -1,44 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Briefcase, MapPin, DollarSign } from 'lucide-react';
 
-export function JobFilters({ jobs, setFilters }) {
+export function JobFilters({ jobs, onFilterChange }) {
   const [selectedFilters, setSelectedFilters] = useState({
     jobType: [],
     salary: [],
     location: [],
   });
 
-  useEffect(() => {
-    if (jobs.length) {
-      const jobTypes = [...new Set(jobs.map((job) => job.job_type))];
-      const locations = [...new Set(jobs.map((job) => job.candidate_required_location))];
-      const salaryRanges = [
-        '0k-50k',
-        '50k-100k',
-        '100k-150k',
-        '150k-200k',
-        '200k-250k',
-        '250k+',
-      ]; // Simplified salary ranges
-
-      setFilters({ jobType: jobTypes, location: locations, salary: salaryRanges });
-    }
-  }, [jobs, setFilters]);
-
   const handleFilterChange = (filterCategory, value) => {
-    setSelectedFilters((prevFilters) => {
-      const updatedFilters = { ...prevFilters };
-      if (updatedFilters[filterCategory].includes(value)) {
-        updatedFilters[filterCategory] = updatedFilters[filterCategory].filter(
-          (filter) => filter !== value
-        );
-      } else {
-        updatedFilters[filterCategory].push(value);
-      }
-      setFilters(updatedFilters); // Pass filters to the parent
-      return updatedFilters;
-    });
+    const updatedFilters = { ...selectedFilters };
+    if (updatedFilters[filterCategory].includes(value)) {
+      updatedFilters[filterCategory] = updatedFilters[filterCategory].filter(
+        (filter) => filter !== value
+      );
+    } else {
+      updatedFilters[filterCategory].push(value);
+    }
+    setSelectedFilters(updatedFilters);
+    onFilterChange(updatedFilters);
   };
+
+  const jobTypes = [...new Set(jobs.map((job) => job.job_type))];
+  const locations = [...new Set(jobs.map((job) => job.candidate_required_location))];
+  const salaryRanges = ['0k-50k', '50k-100k', '100k-150k', '150k-200k', '200k-250k', '250k+'];
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -50,21 +35,17 @@ export function JobFilters({ jobs, setFilters }) {
             <Briefcase className="w-4 h-4 mr-2" />
             Job Type
           </h3>
-          {jobs.length > 0 &&
-            jobs
-              .map((job) => job.job_type)
-              .filter((value, index, self) => self.indexOf(value) === index) // Remove duplicates
-              .map((jobType) => (
-                <label key={jobType} className="flex items-center space-x-2 mb-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedFilters.jobType.includes(jobType)}
-                    onChange={() => handleFilterChange('jobType', jobType)}
-                    className="rounded text-teal-600"
-                  />
-                  <span className="text-gray-700">{jobType}</span>
-                </label>
-              ))}
+          {jobTypes.map((jobType) => (
+            <label key={jobType} className="flex items-center space-x-2 mb-2">
+              <input
+                type="checkbox"
+                checked={selectedFilters.jobType.includes(jobType)}
+                onChange={() => handleFilterChange('jobType', jobType)}
+                className="rounded text-teal-600"
+              />
+              <span className="text-gray-700">{jobType}</span>
+            </label>
+          ))}
         </div>
 
         {/* Location Filter */}
@@ -73,7 +54,7 @@ export function JobFilters({ jobs, setFilters }) {
             <MapPin className="w-4 h-4 mr-2" />
             Location
           </h3>
-          {['Remote', 'On-site', 'Hybrid'].map((location) => (
+          {locations.map((location) => (
             <label key={location} className="flex items-center space-x-2 mb-2">
               <input
                 type="checkbox"
@@ -92,7 +73,7 @@ export function JobFilters({ jobs, setFilters }) {
             <DollarSign className="w-4 h-4 mr-2" />
             Salary
           </h3>
-          {['0k-50k', '50k-100k', '100k-150k', '150k-200k', '200k-250k', '250k+'].map((salary) => (
+          {salaryRanges.map((salary) => (
             <label key={salary} className="flex items-center space-x-2 mb-2">
               <input
                 type="checkbox"
