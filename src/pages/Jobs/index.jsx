@@ -27,7 +27,7 @@ export function Jobs() {
       <JobSearch setSearchQuery={setSearchQuery} />
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="md:col-span-1">
-          <JobFilters jobs={jobs} setFilters={setFilters} />
+          <JobFilters jobs={jobs} onFilterChange={setFilters} />
         </div>
         <div className="md:col-span-3">
           <JobList searchQuery={searchQuery} filters={filters} />

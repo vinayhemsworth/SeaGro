@@ -39,8 +39,10 @@ export function JobList({ searchQuery, filters }) {
     const locationMatch = filters.location.length
       ? filters.location.includes(job.candidate_required_location.split(',')[0])
       : true;
+    const searchMatch = job.title.toLowerCase().includes(searchQuery.job.toLowerCase()) &&
+                        job.candidate_required_location.toLowerCase().includes(searchQuery.location.toLowerCase());
 
-    return jobMatch && locationMatch;
+    return jobMatch && locationMatch && searchMatch;
   });
 
   const indexOfLastJob = currentPage * jobsPerPage;
