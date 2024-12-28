@@ -18,31 +18,14 @@ L.Marker.prototype.options.icon = DefaultIcon;
 export function BikeMap() {
   const [stations, setStations] = useState([]);
 
-  const geoBounds = {
-    latMin: 5, // Extending south for Sri Lanka
-    latMax: 40, // Extending north for Nepal and Bhutan
-    lonMin: 60, // Extending west for Pakistan
-    lonMax: 100, // Extending east for Bangladesh
-  };
-
   useEffect(() => {
     async function fetchStations() {
       try {
         const response = await fetch('https://api.citybik.es/v2/networks');
         const data = await response.json();
 
-        // Filter stations based on geographical bounds
-        const filteredStations = data.networks.filter((network) => {
-          const { latitude, longitude } = network.location;
-          return (
-            latitude >= geoBounds.latMin &&
-            latitude <= geoBounds.latMax &&
-            longitude >= geoBounds.lonMin &&
-            longitude <= geoBounds.lonMax
-          );
-        });
-
-        setStations(filteredStations);
+        // No filtering based on geographical bounds to include all stations
+        setStations(data.networks);
       } catch (error) {
         console.error('Error fetching bike stations:', error);
       }
@@ -54,8 +37,8 @@ export function BikeMap() {
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-8">
       <div className="p-6 border-b border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900">Bikes in India and Nearby Regions</h2>
-        <p className="text-gray-600">Explore available bikes in your region.</p>
+        <h2 className="text-lg font-semibold text-gray-900">Bikes in India and Worldwide</h2>
+        <p className="text-gray-600">Explore available bikes globally, starting with India.</p>
       </div>
       <MapContainer
         center={[20.5937, 78.9629]} // Center of India
