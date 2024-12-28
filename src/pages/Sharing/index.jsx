@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { Categories } from './components/Categories';
+import { TrendingPosts } from './components/TrendingPosts';
+import { PostForm } from './components/PostForm';
 
 export function Sharing() {
   // States for managing file upload and preview
@@ -6,6 +9,7 @@ export function Sharing() {
   const [filePreview, setFilePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Function to handle file selection
   const handleFileChange = (event) => {
@@ -46,50 +50,26 @@ export function Sharing() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-xl">
-        <h1 className="text-3xl font-bold text-white">Content Sharing</h1>
-        <p className="mt-4 text-white">Share your images and videos with the community. Choose your file and hit the share button!</p>
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Left Sidebar - Categories */}
+        <div className="md:col-span-3">
+          <Categories 
+            selectedCategory={selectedCategory} 
+            onCategorySelect={setSelectedCategory} 
+          />
+        </div>
 
-        {/* File upload area */}
-        <div className="mt-6 bg-white p-6 rounded-lg shadow-lg">
-          <div className="flex justify-center items-center flex-col">
-            <input
-              type="file"
-              accept="image/*,video/*"
-              onChange={handleFileChange}
-              className="mt-4 border-2 border-dashed border-gray-400 p-4 rounded-lg cursor-pointer"
-            />
-            {filePreview && (
-              <div className="mt-4 w-full max-w-xs">
-                <h3 className="font-semibold text-lg">Preview</h3>
-                <div className="mt-2">
-                  {file && file.type.startsWith('image') ? (
-                    <img src={filePreview} alt="Preview" className="w-full h-auto rounded-lg shadow-md" />
-                  ) : (
-                    <video src={filePreview} controls className="w-full h-auto rounded-lg shadow-md" />
-                  )}
-                </div>
-              </div>
-            )}
+        {/* Main Content */}
+        <div className="md:col-span-6">
+          <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 p-6 rounded-lg shadow-xl">
+            <h1 className="text-3xl font-bold text-white">Share Your Content</h1>
+            <PostForm />
           </div>
         </div>
 
-        {/* Feedback Message */}
-        {message && (
-          <div className={`mt-4 p-3 rounded-md ${message.includes('success') ? 'bg-green-500 text-white' : 'bg-red-500 text-white'}`}>
-            {message}
-          </div>
-        )}
-
-        {/* Share Button */}
-        <div className="mt-6 flex justify-center">
-          <button
-            onClick={handleShare}
-            disabled={uploading}
-            className={`px-6 py-3 bg-blue-600 text-white rounded-md shadow-md focus:outline-none ${uploading ? 'cursor-not-allowed opacity-50' : ''}`}
-          >
-            {uploading ? 'Uploading...' : 'Share Content'}
-          </button>
+        {/* Right Sidebar - Trending */}
+        <div className="md:col-span-3">
+          <TrendingPosts />
         </div>
       </div>
     </div>
