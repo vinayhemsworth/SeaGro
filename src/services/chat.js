@@ -9,7 +9,7 @@ class ChatService {
   async initialize(token) {
     // Assuming token is used to authenticate the socket connection
     if (!this.socket) {
-      this.socket = getSocket();
+      this.socket = getSocket(token);
 
       if (!this.socket?.connected) {
         console.log('Connecting socket...');

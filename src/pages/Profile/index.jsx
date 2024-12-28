@@ -48,22 +48,22 @@ export function Profile() {
                     onSave={(value) => handleUpdate('name', value)}
                     label="Name"
                   />
-                  <p className="text-gray-600 flex items-center mt-1">
+                  <div className="text-gray-600 flex items-center mt-1">
                     <Briefcase className="w-4 h-4 mr-1" />
                     <EditableField
                       value={profile.role}
                       onSave={(value) => handleUpdate('role', value)}
                       label="Role"
                     />
-                  </p>
-                  <p className="text-gray-600 flex items-center mt-1">
+                  </div>
+                  <div className="text-gray-600 flex items-center mt-1">
                     <MapPin className="w-4 h-4 mr-1" />
                     <EditableField
                       value={profile.location}
                       onSave={(value) => handleUpdate('location', value)}
                       label="Location"
                     />
-                  </p>
+                  </div>
                 </div>
               </div>
               <EditableField

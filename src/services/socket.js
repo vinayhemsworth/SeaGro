@@ -30,7 +30,12 @@ export const initializeSocket = (token) => {
   return socket;
 };
 
-export const getSocket = () => socket;
+export const getSocket = (token) => {
+  if (!socket && token) {
+    socket = initializeSocket(token);
+  }
+  return socket;
+};
 
 export const disconnectSocket = () => {
   if (socket) {

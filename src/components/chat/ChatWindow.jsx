@@ -21,6 +21,11 @@ export function ChatWindow({ selectedUser }) {
   useEffect(() => {
     if (!selectedUser || !user) return;
 
+    if (!chatService.socket?.connected) {
+      console.error('Socket is not connected');
+      return;
+    }
+
     chatService.joinRoom(roomId);
 
     const handleNewMessage = (message) => {
@@ -38,8 +43,8 @@ export function ChatWindow({ selectedUser }) {
     chatService.onTypingUpdate(handleTypingUpdate);
 
     return () => {
-      chatService.socket?.off('new-message');
-      chatService.socket?.off('typing-update');
+      chatService.socket?.off('new-message', handleNewMessage);
+      chatService.socket?.off('typing-update', handleTypingUpdate);
     };
   }, [roomId, selectedUser, user]);
 
