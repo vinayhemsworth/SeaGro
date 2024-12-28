@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { chatService } from '../../services/chat';
 
-export function UserList({ onUserSelect }) {
+export function UserList({ onUserSelect, selectedUserId }) {
   const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -23,7 +23,8 @@ export function UserList({ onUserSelect }) {
   }, []);
 
   const filteredUsers = users.filter(user => 
-    user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -44,12 +45,16 @@ export function UserList({ onUserSelect }) {
       <div className="flex-1 overflow-y-auto">
         {loading ? (
           <div className="p-4 text-center text-gray-500">Loading users...</div>
+        ) : filteredUsers.length === 0 ? (
+          <div className="p-4 text-center text-gray-500">No users found</div>
         ) : (
           filteredUsers.map((user) => (
             <div
               key={user._id}
               onClick={() => onUserSelect(user)}
-              className="p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+              className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                selectedUserId === user._id ? 'bg-teal-50' : ''
+              }`}
             >
               <div className="flex items-center space-x-4">
                 <img

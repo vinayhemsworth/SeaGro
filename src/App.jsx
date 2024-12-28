@@ -14,7 +14,7 @@ import { Chat } from './pages/Chat';
 import { Community } from './pages/Community';
 import { News } from './pages/News';
 import { Sharing } from './pages/Sharing';
-import {Todos} from './pages/Todos';
+import { Todos } from './pages/Todos';
 
 export default function App() {
   return (

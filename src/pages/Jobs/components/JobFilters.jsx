@@ -22,7 +22,8 @@ export function JobFilters({ jobs, onFilterChange }) {
   };
 
   const jobTypes = [...new Set(jobs.map((job) => job.job_type))];
-  const locations = [...new Set(jobs.map((job) => job.candidate_required_location))];
+  const allLocations = [...new Set(jobs.map((job) => job.candidate_required_location.split(',')[0]))];
+  const displayedLocations = allLocations.slice(0, 10); // Show only the first 10 locations
   const salaryRanges = ['0k-50k', '50k-100k', '100k-150k', '150k-200k', '200k-250k', '250k+'];
 
   return (
@@ -54,7 +55,7 @@ export function JobFilters({ jobs, onFilterChange }) {
             <MapPin className="w-4 h-4 mr-2" />
             Location
           </h3>
-          {locations.map((location) => (
+          {displayedLocations.map((location) => (
             <label key={location} className="flex items-center space-x-2 mb-2">
               <input
                 type="checkbox"

@@ -1,68 +1,79 @@
+import { getSocket } from './socket';
 import api from './api';
-import { getSocket, initializeSocket } from './socket';
 
-export const chatService = {
-  socket: null,
+class ChatService {
+  constructor() {
+    this.socket = null; // You may want to store socket instance here
+  }
 
-  initialize(token) {
-    this.socket = initializeSocket(token);
-    return this.socket;
-  },
+  async initialize(token) {
+    // Assuming token is used to authenticate the socket connection
+    if (!this.socket) {
+      this.socket = getSocket();
+
+      if (!this.socket?.connected) {
+        console.log('Connecting socket...');
+        this.socket.connect(); // Assuming the socket needs to be connected explicitly
+
+        // Optionally send token to server for authentication
+        this.socket.on('connect', () => {
+          this.socket.emit('authenticate', { token });
+        });
+      }
+    }
+  }
 
   async getAllUsers() {
-    const response = await api.get('/chat/users');
-    return response.data;
-  },
-
-  sendMessage(content, roomId) {
-    const socket = getSocket();
-    if (!socket) {
-      throw new Error('Socket not initialized');
+    try {
+      const response = await api.get('/chat/users');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      throw error;
     }
-    socket.emit('send-message', { content, roomId });
-  },
+  }
 
   joinRoom(roomId) {
-    const socket = getSocket();
-    if (!socket) {
-      throw new Error('Socket not initialized');
+    if (!this.socket?.connected) {
+      console.error('Cannot join room: Socket is not connected');
+      return;
     }
-    socket.emit('join-room', roomId);
-  },
+    this.socket.emit('join-room', roomId);
+  }
+
+  sendMessage(content, roomId) {
+    if (!this.socket?.connected) {
+      console.error('Cannot send message: Socket is not connected');
+      return;
+    }
+    this.socket.emit('send-message', { content, roomId });
+  }
 
   onNewMessage(callback) {
-    const socket = getSocket();
-    if (socket) {
-      socket.on('new-message', callback);
+    if (this.socket) {
+      this.socket.on('new-message', callback);
     }
-  },
-
-  onMessageUpdated(callback) {
-    const socket = getSocket();
-    if (socket) {
-      socket.on('message-updated', callback);
-    }
-  },
-
-  onMessageDeleted(callback) {
-    const socket = getSocket();
-    if (socket) {
-      socket.on('message-deleted', callback);
-    }
-  },
+  }
 
   onTypingUpdate(callback) {
-    const socket = getSocket();
-    if (socket) {
-      socket.on('typing-update', callback);
+    if (this.socket) {
+      this.socket.on('typing-update', callback);
     }
-  },
+  }
 
   emitTyping(roomId) {
-    const socket = getSocket();
-    if (!socket) {
-      throw new Error('Socket not initialized');
+    if (!this.socket?.connected) {
+      console.error('Cannot emit typing: Socket is not connected');
+      return;
     }
-    socket.emit('typing', roomId);
+    this.socket.emit('typing', roomId);
   }
-};
+
+  removeAllListeners() {
+    if (this.socket) {
+      this.socket.removeAllListeners();
+    }
+  }
+}
+
+export const chatService = new ChatService();

@@ -1,35 +1,29 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = 'http://localhost:5000';
-
 let socket = null;
 
 export const initializeSocket = (token) => {
   if (!token) {
-    console.error('Token is required to initialize socket');
+    console.error('Token required for socket initialization');
     return null;
   }
 
   if (!socket) {
-    socket = io(SOCKET_URL, {
+    socket = io('http://localhost:5000', {
       auth: { token },
-      autoConnect: true,
+      transports: ['websocket'],
       reconnection: true,
       reconnectionAttempts: 5,
-      reconnectionDelay: 2000
+      reconnectionDelay: 1000
     });
 
     socket.on('connect', () => {
-      console.log('Connected to socket server');
+      console.log('Socket connected');
       socket.emit('auth', token);
     });
 
     socket.on('connect_error', (error) => {
       console.error('Socket connection error:', error);
-    });
-
-    socket.on('disconnect', (reason) => {
-      console.log('Disconnected from socket server:', reason);
     });
   }
 

@@ -19,9 +19,9 @@ export function EditableField({ value, onSave, label, multiline = false }) {
     return (
       <div className="group relative">
         {multiline ? (
-          <p className="text-gray-700 leading-relaxed">{value}</p>
+          <div className="text-gray-700 leading-relaxed">{value}</div>
         ) : (
-          <h3 className="text-xl font-semibold text-gray-900">{value}</h3>
+          <div className="text-xl font-semibold text-gray-900">{value}</div>
         )}
         <button
           onClick={() => setIsEditing(true)}
