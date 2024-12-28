@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
- import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -16,7 +17,6 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 export function BikeMap() {
   const [stations, setStations] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const geoBounds = {
     latMin: 5, // Extending south for Sri Lanka
@@ -45,8 +45,6 @@ export function BikeMap() {
         setStations(filteredStations);
       } catch (error) {
         console.error('Error fetching bike stations:', error);
-      } finally {
-        setLoading(false);
       }
     }
 
@@ -59,35 +57,30 @@ export function BikeMap() {
         <h2 className="text-lg font-semibold text-gray-900">Bikes in India and Nearby Regions</h2>
         <p className="text-gray-600">Explore available bikes in your region.</p>
       </div>
-      {loading ? (
-        <div className="flex justify-center items-center h-[500px]">
-          <span className="loader"></span>
-        </div>
-      ) : (
-        <MapContainer
-          center={[20.5937, 78.9629]}
-          zoom={5}
-          className="w-full h-[500px] rounded-b-2xl"
-          scrollWheelZoom
-        >
-          <TileLayer
-            attribution='&copy; OpenStreetMap contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {stations.map((station) => (
-            <Marker
-              key={station.id}
-              position={[station.location.latitude, station.location.longitude]}
-            >
-              <Popup>
-                <strong>{station.name}</strong>
-                <br />
-                Location: {station.location.city}, {station.location.country}
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      )}
+      <MapContainer
+        center={[20.5937, 78.9629]} // Center of India
+        zoom={5}
+        className="w-full h-[500px] rounded-b-2xl"
+        scrollWheelZoom
+      >
+        {/* OpenStreetMap tiles */}
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        {stations.map((station) => (
+          <Marker
+            key={station.id}
+            position={[station.location.latitude, station.location.longitude]}
+          >
+            <Popup>
+              <strong>{station.name}</strong>
+              <br />
+              Location: {station.location.city}, {station.location.country}
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </div>
   );
 }
