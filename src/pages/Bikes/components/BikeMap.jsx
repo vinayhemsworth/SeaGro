@@ -45,6 +45,7 @@ export function BikeMap() {
         zoom={5}
         className="w-full h-[500px] rounded-b-2xl"
         scrollWheelZoom
+        style={{ zIndex: 0 }}
       >
         {/* OpenStreetMap tiles */}
         <TileLayer
