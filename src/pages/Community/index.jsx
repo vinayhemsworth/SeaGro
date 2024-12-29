@@ -1,52 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CreatePost } from './components/CreatePost';
 import { Post } from './components/Post';
 import { Trending } from './components/Trending';
+import { supabase } from '../../utils/supabase';
+import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 export function Community() {
-  const posts = [
-    {
-      id: 1,
-      author: {
-        name: 'Sarah Wilson',
-        avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80'
-      },
-      content: 'Just completed an amazing project using React and Node.js! 🚀',
-      media: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80',
-      timestamp: '2 hours ago',
-      likes: 24,
-      comments: [
-        {
-          author: {
-            name: 'John Doe',
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80'
-          },
-          content: 'Looks fantastic! Would love to learn more about the architecture.',
-          timestamp: '1 hour ago'
-        }
-      ]
-    },
-    {
-      id: 2,
-      author: {
-        name: 'Mike Johnson',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80'
-      },
-      content: 'Sharing my experience with AWS Lambda and Serverless Architecture',
-      timestamp: '5 hours ago',
-      likes: 15,
-      comments: []
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const fetchPosts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          comments (*),
+          likes (*)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setPosts(data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      toast.error('Failed to load posts');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <CreatePost />
-          {posts.map(post => (
-            <Post key={post.id} post={post} />
-          ))}
+          <CreatePost onPostCreated={fetchPosts} />
+          {loading ? (
+            <div className="flex justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+            </div>
+          ) : (
+            posts.map(post => (
+              <Post 
+                key={post.id} 
+                post={post} 
+                currentUser={user}
+                onPostUpdated={fetchPosts}
+              />
+            ))
+          )}
         </div>
         <div className="lg:col-span-1">
           <Trending />

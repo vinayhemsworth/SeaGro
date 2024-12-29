@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Briefcase } from 'lucide-react';
 import { ImageUpload } from '../../components/profile/ImageUpload';
 import { EditableField } from '../../components/profile/EditableField';
 import { ProfileStats } from './components/ProfileStats';
 import { ActivityFeed } from './components/ActivityFeed';
 import { ProfileSidebar } from './components/ProfileSidebar';
+
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../utils/supabase';
+import { toast } from 'react-hot-toast';
 
 export function Profile() {
   const [profile, setProfile] = useState({
@@ -16,12 +20,24 @@ export function Profile() {
     coverImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?auto=format&fit=crop&q=80',
     connections: 1234,
     projects: 45,
-    certifications: 12
+    certifications: 12,
+    skills: 'JavaScript, React, Node.js'
   });
 
   const handleUpdate = (field, value) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
+    setProfile(prev => {
+      const updatedProfile = { ...prev, [field]: value };
+      localStorage.setItem('profile', JSON.stringify(updatedProfile));
+      return updatedProfile;
+    });
   };
+
+  useEffect(() => {
+    const storedProfile = JSON.parse(localStorage.getItem('profile'));
+    if (storedProfile) {
+      setProfile(storedProfile);
+    }
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -62,6 +78,13 @@ export function Profile() {
                       value={profile.location}
                       onSave={(value) => handleUpdate('location', value)}
                       label="Location"
+                    />
+                  </div>
+                  <div className="text-gray-600 flex items-center mt-1">
+                    <EditableField
+                      value={profile.skills}
+                      onSave={(value) => handleUpdate('skills', value)}
+                      label="Skills"
                     />
                   </div>
                 </div>

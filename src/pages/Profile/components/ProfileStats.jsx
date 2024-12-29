@@ -2,10 +2,38 @@ import React from 'react';
 import { Users, FolderGit2, Award } from 'lucide-react';
 
 export function ProfileStats({ user }) {
+  if (!user) {
+    return (
+      <div className="grid grid-cols-3 gap-4 my-8">
+        <div className="bg-white p-6 rounded-2xl shadow-sm animate-pulse">
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm animate-pulse">
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+        <div className="bg-white p-6 rounded-2xl shadow-sm animate-pulse">
+          <div className="h-12 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   const stats = [
-    { icon: Users, label: 'Connections', value: user.connections },
-    { icon: FolderGit2, label: 'Projects', value: user.projects },
-    { icon: Award, label: 'Certifications', value: user.certifications }
+    { 
+      icon: Users, 
+      label: 'Connections', 
+      value: user.connections || 0 
+    },
+    { 
+      icon: FolderGit2, 
+      label: 'Projects', 
+      value: user.projects || 0 
+    },
+    { 
+      icon: Award, 
+      label: 'Certifications', 
+      value: user.certifications || 0 
+    }
   ];
 
   return (

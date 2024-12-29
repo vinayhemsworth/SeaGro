@@ -1,99 +1,122 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, Share2, MoreHorizontal } from 'lucide-react';
+import { Heart, MessageCircle } from 'lucide-react';
+import { supabase } from '../../../utils/supabase';
+import { useAuth } from '../../../context/AuthContext';
+import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'react-hot-toast';
 
-export function Post({ post }) {
-  const [liked, setLiked] = useState(false);
+export function Post({ post, onPostUpdated }) {
+  const [comment, setComment] = useState('');
   const [showComments, setShowComments] = useState(false);
+  const { user } = useAuth();
+  
+  // Generate a UUID for the user
+  const userUUID = crypto.randomUUID();
+
+  const isLiked = post.likes?.some(like => like.user_id === userUUID);
+
+  const handleLike = async () => {
+    try {
+      if (isLiked) {
+        await supabase
+          .from('likes')
+          .delete()
+          .match({ post_id: post.id, user_id: userUUID });
+      } else {
+        await supabase
+          .from('likes')
+          .insert([{ post_id: post.id, user_id: userUUID }]);
+      }
+      onPostUpdated();
+    } catch (error) {
+      console.error('Error toggling like:', error);
+      toast.error('Failed to update like');
+    }
+  };
+
+  const handleComment = async (e) => {
+    e.preventDefault();
+    if (!comment.trim()) return;
+
+    try {
+      await supabase
+        .from('comments')
+        .insert([{
+          post_id: post.id,
+          user_id: userUUID,
+          content: comment
+        }]);
+
+      setComment('');
+      onPostUpdated();
+      toast.success('Comment added');
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      toast.error('Failed to add comment');
+    }
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm">
-      <div className="p-4">
-        <div className="flex justify-between items-start">
-          <div className="flex space-x-3">
+    <div className="bg-white rounded-xl shadow-sm p-4">
+      <div className="flex items-start space-x-3">
+        <div className="flex-1">
+          <p className="font-medium">User</p>
+          <p className="text-gray-500 text-sm">
+            {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
+          </p>
+          <p className="mt-2">{post.content}</p>
+          {post.media_url && (
             <img
-              src={post.author.avatar}
-              alt={post.author.name}
-              className="w-10 h-10 rounded-full"
+              src={`${supabase.storageUrl}/object/public/post-media/${post.media_url}`}
+              alt="Post media"
+              className="mt-2 rounded-lg max-h-96 w-auto"
             />
-            <div>
-              <h3 className="font-semibold">{post.author.name}</h3>
-              <p className="text-sm text-gray-500">{post.timestamp}</p>
-            </div>
-          </div>
-          <button className="p-2 hover:bg-gray-100 rounded-full">
-            <MoreHorizontal className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-        
-        <p className="mt-3">{post.content}</p>
-        
-        {post.media && (
-          <img
-            src={post.media}
-            alt="Post content"
-            className="mt-3 rounded-lg w-full"
-          />
-        )}
-        
-        <div className="flex items-center justify-between mt-4 pt-3 border-t">
-          <button
-            onClick={() => setLiked(!liked)}
-            className={`flex items-center space-x-2 ${liked ? 'text-red-500' : 'text-gray-500'}`}
-          >
-            <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-            <span>{post.likes + (liked ? 1 : 0)}</span>
-          </button>
-          
-          <button
-            onClick={() => setShowComments(!showComments)}
-            className="flex items-center space-x-2 text-gray-500"
-          >
-            <MessageCircle className="w-5 h-5" />
-            <span>{post.comments.length}</span>
-          </button>
-          
-          <button className="flex items-center space-x-2 text-gray-500">
-            <Share2 className="w-5 h-5" />
-            <span>Share</span>
-          </button>
+          )}
         </div>
       </div>
-      
+
+      <div className="mt-4 flex items-center space-x-4">
+        <button
+          onClick={handleLike}
+          className={`flex items-center space-x-1 ${isLiked ? 'text-teal-500' : 'text-gray-500'}`}
+        >
+          <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+          <span>{post.likes?.length || 0}</span>
+        </button>
+        <button
+          onClick={() => setShowComments(!showComments)}
+          className="flex items-center space-x-1 text-gray-500"
+        >
+          <MessageCircle className="w-5 h-5" />
+          <span>{post.comments?.length || 0}</span>
+        </button>
+      </div>
+
       {showComments && (
-        <div className="border-t p-4 space-y-4">
-          {post.comments.map((comment, index) => (
-            <div key={index} className="flex space-x-3">
-              <img
-                src={comment.author.avatar}
-                alt={comment.author.name}
-                className="w-8 h-8 rounded-full"
-              />
-              <div className="flex-1">
-                <div className="bg-gray-50 rounded-xl p-3">
-                  <h4 className="font-semibold">{comment.author.name}</h4>
-                  <p>{comment.content}</p>
-                </div>
-                <div className="flex items-center space-x-4 mt-1 text-sm text-gray-500">
-                  <button>Like</button>
-                  <button>Reply</button>
-                  <span>{comment.timestamp}</span>
-                </div>
+        <div className="mt-4 space-y-4">
+          {post.comments?.map(comment => (
+            <div key={comment.id} className="flex space-x-2">
+              <div className="flex-1 bg-gray-50 rounded-lg p-3">
+                <p className="font-medium">User</p>
+                <p>{comment.content}</p>
               </div>
             </div>
           ))}
-          
-          <div className="flex space-x-3 mt-4">
-            <img
-              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80"
-              alt="Your avatar"
-              className="w-8 h-8 rounded-full"
-            />
+          <form onSubmit={handleComment} className="flex space-x-2">
             <input
               type="text"
-              placeholder="Write a comment..."
-              className="flex-1 bg-gray-50 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add a comment..."
+              className="flex-1 rounded-lg border p-2"
             />
-          </div>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-teal-500 text-white rounded-lg"
+            >
+              Comment
+            </button>
+          </form>
         </div>
       )}
     </div>
