@@ -33,9 +33,9 @@ export function Profile() {
   };
 
   useEffect(() => {
-    const storedProfile = JSON.parse(localStorage.getItem('profile'));
+    const storedProfile = localStorage.getItem('profile');
     if (storedProfile) {
-      setProfile(storedProfile);
+      setProfile(JSON.parse(storedProfile));
     }
   }, []);
 
