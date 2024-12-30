@@ -1,81 +1,117 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { Star, Clock, Users } from 'lucide-react';
+import { CATEGORIES } from '../../../constants/courseCategories';
 
+// YouTube API URL (Replace with your actual API Key)
+const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
+const YOUTUBE_API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&q=tech&maxResults=12`;
 export function CourseGrid() {
-  const courses = [
-    {
-      id: 1,
-      title: 'Advanced React Patterns',
-      instructor: 'Sarah Wilson',
-      thumbnail: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80',
-      rating: 4.8,
-      students: 1234,
-      duration: '6 hours',
-      level: 'Advanced'
-    },
-    {
-      id: 2,
-      title: 'Node.js Microservices',
-      instructor: 'John Doe',
-      thumbnail: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&q=80',
-      rating: 4.7,
-      students: 987,
-      duration: '8 hours',
-      level: 'Intermediate'
-    },
-    {
-      id: 3,
-      title: 'AWS Solutions Architecture',
-      instructor: 'Mike Johnson',
-      thumbnail: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80',
-      rating: 4.9,
-      students: 2345,
-      duration: '12 hours',
-      level: 'Advanced'
-    }
-  ];
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [filters, setFilters] = useState({
+    level: [],
+    duration: [],
+    topics: [],
+    rating: ''
+  });
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch(`${YOUTUBE_API_URL}&q=${activeCategory.query}`);
+        const data = await response.json();
+
+        if (data.items) {
+          // Add mock metadata to each video
+          const videosWithMetadata = data.items.map(video => ({
+            ...video,
+            metadata: {
+              rating: (4 + Math.random()).toFixed(1),
+              duration: Math.floor(Math.random() * 180) + 30,
+              level: ['Beginner', 'Intermediate', 'Advanced'][Math.floor(Math.random() * 3)]
+            },
+            category: activeCategory.title
+          }));
+          setVideos(videosWithMetadata);
+        }
+      } catch (err) {
+        setError('Failed to fetch videos');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, [activeCategory]);
+
+  const handleVideoClick = (video) => {
+    setSelectedVideo(video);
+  };
+
+  // If the data is still loading or an error occurred
+  if (loading) {
+    return <div>Loading videos...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {courses.map((course) => (
-        <div
-          key={course.id}
-          className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-        >
-          <div className="aspect-video relative">
-            <img
-              src={course.thumbnail}
-              alt={course.title}
-              className="w-full h-full object-cover"
+    <div className="space-y-6">
+      {/* Category Selector */}
+      <div className="flex flex-wrap gap-4 mb-6">
+        {CATEGORIES.map(category => (
+          <button
+            key={category.id}
+            onClick={() => setActiveCategory(category)}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              activeCategory.id === category.id
+                ? 'bg-teal-500 text-white'
+                : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            {category.title}
+          </button>
+        ))}
+      </div>
+
+      {/* Video Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {videos.map((video) => (
+          <CourseCard
+            key={video.id.videoId}
+            video={video}
+            onVideoClick={handleVideoClick}
+          />
+        ))}
+      </div>
+
+      {/* Video Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-4 w-full max-w-4xl">
+            <iframe
+              width="100%"
+              height="400"
+              src={`https://www.youtube.com/embed/${selectedVideo.id.videoId}`}
+              title={selectedVideo.snippet.title}
+              frameBorder="0"
+              allowFullScreen
             />
-            <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded-lg text-sm font-medium">
-              {course.level}
-            </div>
-          </div>
-          
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              {course.title}
-            </h3>
-            <p className="text-gray-600 mb-4">{course.instructor}</p>
-            
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center text-yellow-500">
-                <Star className="w-4 h-4 fill-current" />
-                <span className="ml-1">{course.rating}</span>
-              </div>
-              <div className="flex items-center text-gray-600">
-                <Users className="w-4 h-4 mr-1" />
-                {course.students}
-              </div>
-              <div className="flex items-center text-gray-600">
-                <Clock className="w-4 h-4 mr-1" />
-                {course.duration}
-              </div>
-            </div>
+            <button
+              className="mt-4 px-4 py-2 bg-teal-500 text-white rounded-lg"
+              onClick={() => setSelectedVideo(null)}
+            >
+              Close
+            </button>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
