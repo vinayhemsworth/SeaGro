@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CourseGrid } from './components/CourseGrid';
 import { CourseFilters } from './components/CourseFilters';
+import { CATEGORIES } from '../../constants/categories';
 
 export function Learning() {
   const [filters, setFilters] = useState({

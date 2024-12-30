@@ -1,4 +1,5 @@
 import { BarChart2, Clock, Tag, Book } from 'lucide-react';
+import { CATEGORIES } from '../../../constants/categories';
 
 export function CourseFilters({ filters = {}, onFilterChange = () => {} }) {
   const filterOptions = {

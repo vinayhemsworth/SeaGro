@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Clock, Users } from 'lucide-react';
-import { CATEGORIES } from '../../../constants/courseCategories';
+import { CATEGORIES } from '../../../constants/categories';
+import { CourseCard } from './CourseCard';
 
-// YouTube API URL (Replace with your actual API Key)
-const API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY;
-const YOUTUBE_API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&q=tech&maxResults=12`;
+const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+const YOUTUBE_API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&maxResults=12`;
+
 export function CourseGrid() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState(CATEGORIES[0]);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const [filters, setFilters] = useState({
-    level: [],
-    duration: [],
-    topics: [],
-    rating: ''
-  });
 
   useEffect(() => {
     const fetchVideos = async () => {
