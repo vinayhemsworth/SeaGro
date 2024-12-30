@@ -34,7 +34,7 @@ export function CreatePost({ onPostCreated }) {
           {
             content,
             media_url: mediaUrl,
-            user_id: user._id  // Store MongoDB user ID directly
+            user_id: user._id
           }
         ]);
 

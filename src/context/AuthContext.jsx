@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '../services/auth';
 import { chatService } from '../services/chat';
+import { supabase } from '../utils/supabase';
 
 const AuthContext = createContext(null);
 
@@ -18,9 +19,29 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  const syncProfile = async (userData) => {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          user_id: userData._id,
+          name: userData.name,
+          avatar_url: userData.avatar_url
+        }, {
+          onConflict: 'user_id',
+          returning: 'minimal'
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error syncing profile:', error);
+    }
+  };
+
   const login = async (credentials) => {
     try {
       const data = await authService.login(credentials);
+      await syncProfile(data);
       setUser(data);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
@@ -34,6 +55,7 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     try {
       const data = await authService.register(userData);
+      await syncProfile(data);
       setUser(data);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));

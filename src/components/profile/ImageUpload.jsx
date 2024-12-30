@@ -8,12 +8,10 @@ export function ImageUpload({ currentImage, onImageChange, type = 'avatar' }) {
 
   const uploadToSupabase = async (file) => {
     try {
-      // Set folder based on type
       const folder = type === 'avatar' ? 'avatars' : 'covers';
       const fileExt = file.name.split('.').pop();
       const fileName = `${folder}/${Date.now()}.${fileExt}`;
 
-      // Upload to Supabase storage
       const { data, error } = await supabase.storage
         .from('profile-images')
         .upload(fileName, file, {
@@ -23,12 +21,7 @@ export function ImageUpload({ currentImage, onImageChange, type = 'avatar' }) {
 
       if (error) throw error;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(fileName);
-
-      return publicUrl;
+      return fileName;
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('Error uploading image');
