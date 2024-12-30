@@ -12,13 +12,10 @@ export function CreatePost({ onPostCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!content.trim() || loading) return;
+    if (!content.trim() || loading || !user) return;
 
     setLoading(true);
     try {
-      // Generate a UUID for the user_id
-      const userUUID = crypto.randomUUID();
-      
       let mediaUrl = null;
       if (mediaFile) {
         const fileExt = mediaFile.name.split('.').pop();
@@ -31,17 +28,17 @@ export function CreatePost({ onPostCreated }) {
         mediaUrl = fileData.path;
       }
 
-      const { error } = await supabase
+      const { error: postError } = await supabase
         .from('posts')
         .insert([
           {
-            user_id: userUUID,
             content,
-            media_url: mediaUrl
+            media_url: mediaUrl,
+            user_id: user._id  // Store MongoDB user ID directly
           }
         ]);
 
-      if (error) throw error;
+      if (postError) throw postError;
 
       setContent('');
       setMediaFile(null);
@@ -80,7 +77,7 @@ export function CreatePost({ onPostCreated }) {
           </label>
           <button
             type="submit"
-            disabled={loading || !content.trim()}
+            disabled={loading || !content.trim() || !user}
             className="px-4 py-2 bg-teal-500 text-white rounded-full hover:bg-teal-600 disabled:opacity-50 flex items-center space-x-2"
           >
             <Send className="w-4 h-4" />

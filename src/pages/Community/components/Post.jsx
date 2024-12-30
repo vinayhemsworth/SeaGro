@@ -10,22 +10,30 @@ export function Post({ post, onPostUpdated }) {
   const [showComments, setShowComments] = useState(false);
   const { user } = useAuth();
   
-  // Generate a UUID for the user
-  const userUUID = crypto.randomUUID();
-
-  const isLiked = post.likes?.some(like => like.user_id === userUUID);
+  const isLiked = post.likes?.some(like => like.user_id === user?._id);
 
   const handleLike = async () => {
+    if (!user) {
+      toast.error('Please login to like posts');
+      return;
+    }
+
     try {
       if (isLiked) {
         await supabase
           .from('likes')
           .delete()
-          .match({ post_id: post.id, user_id: userUUID });
+          .match({ 
+            post_id: post.id, 
+            user_id: user._id 
+          });
       } else {
         await supabase
           .from('likes')
-          .insert([{ post_id: post.id, user_id: userUUID }]);
+          .insert([{ 
+            post_id: post.id, 
+            user_id: user._id 
+          }]);
       }
       onPostUpdated();
     } catch (error) {
@@ -36,14 +44,14 @@ export function Post({ post, onPostUpdated }) {
 
   const handleComment = async (e) => {
     e.preventDefault();
-    if (!comment.trim()) return;
+    if (!comment.trim() || !user) return;
 
     try {
       await supabase
         .from('comments')
         .insert([{
           post_id: post.id,
-          user_id: userUUID,
+          user_id: user._id,
           content: comment
         }]);
 
