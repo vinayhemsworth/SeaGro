@@ -1,6 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Building2, DollarSign, Clock } from 'lucide-react';
 
+const ShimmerEffect = () => (
+  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+);
+
+function JobCardSkeleton() {
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm">
+      <div className="flex items-start space-x-4">
+        <div className="w-16 h-16 bg-gray-200/70 rounded-xl relative overflow-hidden">
+          <ShimmerEffect />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="h-6 w-48 bg-gray-200/70 rounded mb-2 relative overflow-hidden">
+                <ShimmerEffect />
+              </div>
+              <div className="h-4 w-32 bg-gray-200/70 rounded relative overflow-hidden">
+                <ShimmerEffect />
+              </div>
+            </div>
+            <div className="h-10 w-24 bg-gray-200/70 rounded-xl relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-4">
+            <div className="h-4 w-24 bg-gray-200/70 rounded relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+            <div className="h-4 w-32 bg-gray-200/70 rounded relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+            <div className="h-4 w-28 bg-gray-200/70 rounded relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function JobList({ searchQuery, filters }) {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +56,7 @@ export function JobList({ searchQuery, filters }) {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('https://remotive.com/api/remote-jobs');
+        const response = await fetch(import.meta.env.VITE_REMOTIVE_API_URL);
         if (!response.ok) throw new Error('Failed to fetch data');
         const data = await response.json();
         if (data.jobs && Array.isArray(data.jobs)) {
@@ -57,7 +99,13 @@ export function JobList({ searchQuery, filters }) {
   const startPage = Math.max(1, currentPage - Math.floor(maxPageButtons / 2));
   const endPage = Math.min(totalPages, startPage + maxPageButtons - 1);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div className="space-y-4">
+      {[...Array(5)].map((_, index) => (
+        <JobCardSkeleton key={index} />
+      ))}
+    </div>
+  );
   if (error) return <div>Error: {error}</div>;
 
   return (

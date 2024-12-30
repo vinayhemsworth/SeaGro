@@ -1,6 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { MapPin, Battery, Star } from 'lucide-react';
 
+function BikeCardSkeleton() {
+  return (
+    <div className="bg-white p-6 rounded-2xl shadow-sm animate-pulse">
+      <div className="flex items-start space-x-4">
+        <div className="flex-1">
+          <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+          <div className="flex items-center space-x-1">
+            <div className="h-4 w-20 bg-gray-200 rounded"></div>
+          </div>
+          <div className="mt-4 grid grid-cols-2 gap-4">
+            <div className="h-4 bg-gray-200 rounded w-24"></div>
+            <div className="h-4 bg-gray-200 rounded w-16"></div>
+          </div>
+          <div className="mt-4 h-10 bg-gray-200 rounded-xl w-full"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BikeList({ filters = {} }) {
   const [bikes, setBikes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +31,7 @@ export function BikeList({ filters = {} }) {
   useEffect(() => {
     async function fetchBikes() {
       try {
-        const response = await fetch('http://api.citybik.es/v2/networks');
+        const response = await fetch(import.meta.env.VITE_CITYBIKES_API_URL);
         const data = await response.json();
         const networks = data.networks.slice(0, 50); // Fetch only the first 50 networks
         const bikeData = networks.map((network) => ({
@@ -46,8 +67,10 @@ export function BikeList({ filters = {} }) {
   return (
     <div className="space-y-4">
       {loading ? (
-        <div className="flex justify-center items-center">
-          <span className="loader"></span>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, index) => (
+            <BikeCardSkeleton key={index} />
+          ))}
         </div>
       ) : (
         <>

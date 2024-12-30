@@ -21,7 +21,7 @@ export function BikeMap() {
   useEffect(() => {
     async function fetchStations() {
       try {
-        const response = await fetch('https://api.citybik.es/v2/networks');
+        const response = await fetch(import.meta.env.VITE_CITYBIKES_API_URL);
         const data = await response.json();
 
         // No filtering based on geographical bounds to include all stations

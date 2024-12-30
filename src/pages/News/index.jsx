@@ -3,6 +3,50 @@ import React, { useState, useEffect } from 'react';
 // API URL for fetching technology news  
 const API_URL = 'https://gnews.io/api/v4/search?q=technology&lang=en&apikey=da879d86c56bf9f0a41d50d5b5c31639';
 
+// Add this component before LoadingSkeleton
+const ShimmerEffect = () => (
+  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+);
+
+const LoadingSkeleton = () => (
+  <div>
+    {/* Skeleton for the header */}
+    <div className="relative overflow-hidden bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 p-6 rounded-lg shadow-xl">
+      <div className="h-8 bg-gray-200/70 rounded w-1/3 relative overflow-hidden">
+        <ShimmerEffect />
+      </div>
+      <div className="mt-4 h-4 bg-gray-200/70 rounded w-2/3 relative overflow-hidden">
+        <ShimmerEffect />
+      </div>
+    </div>
+
+    {/* Skeleton for the articles grid */}
+    <div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {[...Array(6)].map((_, index) => (
+        <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="w-full h-48 bg-gray-200/70 relative overflow-hidden">
+            <ShimmerEffect />
+          </div>
+          <div className="p-6">
+            <div className="h-6 bg-gray-200/70 rounded w-3/4 relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+            <div className="mt-2 h-4 bg-gray-200/70 rounded w-full relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+            <div className="mt-2 h-4 bg-gray-200/70 rounded w-2/3 relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+            <div className="mt-4 h-4 bg-gray-200/70 rounded w-1/4 relative overflow-hidden">
+              <ShimmerEffect />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 export function News() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +91,7 @@ export function News() {
 
       {/* Loading / Error State */}
       {loading && (
-        <div className="mt-6 text-center text-lg text-gray-600">Loading news...</div>
+        <LoadingSkeleton />
       )}
       {error && (
         <div className="mt-6 text-center text-lg text-red-500">{error}</div>

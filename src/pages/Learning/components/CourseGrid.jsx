@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Star, Clock, Users } from 'lucide-react';
 import { CATEGORIES } from '../../../constants/categories';
 import { CourseCard } from './CourseCard';
+import { SkeletonCard } from './SkeletonCard';
 
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
 const YOUTUBE_API_URL = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&part=snippet&type=video&maxResults=12`;
@@ -49,7 +50,26 @@ export function CourseGrid() {
 
   // If the data is still loading or an error occurred
   if (loading) {
-    return <div>Loading videos...</div>;
+    return (
+      <div className="space-y-6">
+        {/* Category Selector Skeleton */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          {[1, 2, 3, 4].map(i => (
+            <div
+              key={i}
+              className="h-10 w-24 bg-gray-200 rounded-lg animate-pulse"
+            />
+          ))}
+        </div>
+
+        {/* Video Grid Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   if (error) {
