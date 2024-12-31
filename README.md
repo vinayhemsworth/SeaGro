@@ -38,6 +38,17 @@ SeaGrow is an innovative platform designed to empower professionals through netw
    npm run build
    ```
 
+ ## .env Format
+   ```.env
+   VITE_GEMINI_API_KEY='Your Gemini API key'
+   MONGODB_URI='Your mongodb uri'
+   JWT_SECRET='Gernate your jst token'
+   PORT=5000
+   VITE_YOUTUBE_API_KEY='your youtube API key'
+   VITE_CITYBIKES_API_URL='Your citybike api'
+   VITE_REMOTIVE_API_URL='Your remote job api' 
+   ```
+
 ## 🌟 Core Components
 
 ### Hero Section
